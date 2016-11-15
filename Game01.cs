@@ -21,6 +21,9 @@ namespace Game01
         Image[] animatie = new Image[4];
         ResourceManager resoureManager = new ResourceManager("Game01.Properties.Resources",
             Assembly.GetExecutingAssembly());
+
+        private Point loc = new Point(0,0);
+        private bool up, down, left, right;
         int i = 0;
         bool animating = false;
         public Game01()
@@ -40,18 +43,42 @@ namespace Game01
                 FrameDimension dimension = new FrameDimension(asdf.FrameDimensionsList[0]);
                 // Number of frames
                 int frameCount = asdf.GetFrameCount(dimension);
-                // Return an Image at a certain index
                 asdf.SelectActiveFrame(dimension, i);
                 Text = frameCount.ToString() + ", " + i;
                 //Text = asdf.GetFrameCount(dimension).ToString();
-                args.Graphics.DrawImage(asdf, 0,0, Width,Height);
-                
-                
+                args.Graphics.FillRectangle(Brushes.Black, loc.X,loc.Y, 20,20);
             };
             KeyDown += (sender, args) => { animating = true;
-                Text = "asdf";
+                if (args.KeyCode == Keys.Up)
+                    up = true;
+                if (args.KeyCode == Keys.Down)
+                    down = true;
+                if (args.KeyCode == Keys.Left)
+                    left = true;
+                if (args.KeyCode == Keys.Right)
+                    right = true;
+                if (up && down)
+                {
+                    up = false;
+                    down = false;
+                }
+                if (left && right)
+                {
+                    left = false;
+                    right = false;
+                }
             };
-            KeyUp += (sender, args) => { animating = false; };
+            KeyUp += (sender, args) =>
+            {
+                if (args.KeyCode == Keys.Up)
+                    up = false;
+                if (args.KeyCode == Keys.Down)
+                    down = false;
+                if (args.KeyCode == Keys.Left)
+                    left = false;
+                if (args.KeyCode == Keys.Right)
+                    right = false;
+            };
             tr = new Thread(Animate);
             tr.Start();
         }
@@ -74,8 +101,16 @@ namespace Game01
                         i = 0;
                     //Text = i.ToString();
                     gamePanel.Invalidate();
-                    Thread.Sleep(110);
                 }
+                if (up)
+                    loc.Y--;
+                if (down)
+                    loc.Y++;
+                if (left)
+                    loc.X--;
+                if (right)
+                    loc.X++;
+                Thread.Sleep(110);
             }
         }
 
